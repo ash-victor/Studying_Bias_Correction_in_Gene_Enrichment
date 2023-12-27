@@ -1,0 +1,197 @@
+---
+title: " Identification of GO and KEGG Differences between Enrichment Methods with and without Bias Correction for CpG Sites Associated with Gestational Age at Birth"
+output: html_document
+date: '2022-05-11'
+---
+
+### Mentor: Dr. Timothy York, Professor of Human and Molecular Genetics
+
+### Student: Ashley Victor, Center for Biological Data Science, Bioinformatics major
+
+```{r global, include = FALSE}
+knitr::opts_chunk$set(echo     = TRUE,
+                      warning  = FALSE,
+                      message  = FALSE)
+```
+
+# Abstract
+
+The research aimed to build upon the Pregnancy, Race, Environment and Genes (PREG) study of DNA methylation levels in fetal tissue and gestational age at birth. The current study utilized the missMethyl R package that took multi-probe bias into account and enriched CpGs of specific genomic regions. A fundamental aspect of the study was to understand the differences between how current enrichment methods address multi-probe bias correction and employ one of these methods on the DNAm data from the PREG study. It was hypothesized that there would be a change in enriched Gene Ontology and KEGG pathways from the PREG study, which showed that the differentially methylated regions to be associated with immune response. The enrichment results of the current study was consistent with the PREG study, indicating that the DMPs were associated with inflammatory activation and immune response.
+
+# Background
+
+A multitude of complex environmental and genetic components interplay to determine gestational age at birth. Understanding how both components impact one another is essential to understanding the etiology of an early gestational age, otherwise known as preterm birth. Specifically, the PREG study focused on how preterm birth might be influenced by fetal epigenetic regulation.
+
+The Pregnancy, Race, Environment and Genes (PREG) study was the basis of our current research that aimed to gain an improved understanding of DNA methylation levels in the fetal tissue and its impact on gestational age. The York et. al. study utilized the minfi Bioconductor package to process and analyze the DNA methylation raw data from N = 135 umbilical cord blood samples. To perform enrichment analysis and identify the distribution of the differentially methylated CpG sites associated with gestational age, researchers utilized the clusterProfiler package. The PREG study revealed 2,372 significant overlapping DMPs, which mapped to 1,842 genes (York et. al., 2020). The biological relevance to the differentially methylated regions showed to be associated with an immune response. Yet, the enrichment method utilized in the PREG study did not consider what is now known as the multi-probe bias. The multi-probe bias considers that particular gene sets have genes that contain more than the average number of measured CpG sites, making these gene sets more likely to be labeled as significantly enriched (Dong et. al, 2019). Therefore, the objective of our current study was to inspect how applying a gene enrichment method that accounted for probe-bias would change gene enrichment results from the PREG analysis.
+
+Bioinformatic enrichment methods are commonly used to understand which genes are over-represented among the significant study features compared to all features tested, in this case CpG sites from the Illumina 450K DNA methylation array. The fundamental framework of the study was based on understanding the differences between the current enrichment methods. All enrichment methods have a similar objective of identifying enriched genes and pathways; however, the statistical procedure for accounting the multi-probe bias is different amongst the different enrichment methods. The following sections exemplifies how each of the chosen methods mitigates the issue of particular genes having more enriched CpG probes than other genes, given that the number of CpG probes correlates with the gene size. We explored several possible alternative methods to compare with the original PREG findings, including: GOmeth/GO region, methylGSA, and ebSGEA.
+
+### GOmeth/GOregion method
+
+The GOmeth and the GOregion are enrichment tools that analyze a collection of genes that belong to a biological process in regards to differential methylation of CpG sites and genomic regions(Maksimovic et. al., 2021). The GOmeth and the GOregion methods utilize Wallenius' noncentral hypergeometric distribution to ensure that multiple probes do not increase the chance naming the gene as "enriched." The researchers tested this method by conducting GOmeth and GOregion enrichment calculations with blood cell type and developing B cell datasets, which produced biologically relevant GO terms and pathways (Maksimovic et. al., 2021).
+
+### methylGSA method
+
+The methylGSA method has a similar objective of identifying the enriched genes associated with the differential methylated CpG sites, while using the three measures for accounting for the multi-probe bias. methylGSA accounts for the number of CpGs as a covariate for logistic regression, adjusts for multiple p-values, and uses Wallenius' noncentral hypergeometric distribution for adjusting the number of CpGs (Ren and Kuan, 2022).
+
+### ebSGEA method
+
+The ebGSEA, empirical Bayes interpretation Gene Set enrichment analysis, achieves a similar purpose of identifying the enriched genomic regions based on the differential methylation patterns at the CpG sites (Dong et. al., 2019). However, unlike the previous methods discussed, the ebGSEA enrichment method ranks genes to the overall differential methylation through a global test (Dong et. al., 2019).
+
+# Methods
+
+A total of 2372 CpG loci were previously identified to be associated with gestational age at birth from a previous study of DNA methylation patterns measured in human umbilical cord blood. Within gometh function of missMethyl, gene ontology terms and KEGG pathways were determined for the enriched CpG sites for overall genomic regions and specific genomic regions. The specific genomic regions studied were: Promoter region, TSS200, first exon, 3' UTR, 5'UTR, and body. The gene ontology terms and KEGG pathways were determined using with and without bias correction and these results were compared with the PREG study results. The following code shows an example of the enrichment test to find GO terms for enriched CpGs in all genomic regions with bias correction. The full r script for all enrichment tests can be found here <https://mfr.osf.io/render?url=https://osf.io/brfqs/?direct%26mode=render%26action=download%26mode=render>.
+
+```{r eval=FALSE}
+# Load libraries
+library(missMethyl)
+library(IlluminaHumanMethylation450kanno.ilmn12.hg19)
+library(fs)
+library(knitr)
+library(kableExtra)
+
+```
+
+```{r eval=FALSE}
+# Load data 
+load("/Users/15713/Documents/Project/overlap-bkg-fdr5percent-precise.Rdata")
+
+```
+
+```{r eval=FALSE}
+
+# perform gene enrichment test for all genomic regions for enriched GO terms with bias correction 
+subverse <- names(tempC)
+universe <- names(uni)
+
+gst.go <- gometh(sig.cpg   = subverse, 
+                 all.cpg    = universe, 
+                 collection = "GO",
+                 prior.prob = TRUE,
+                 plot.bias  = FALSE)
+
+kable(topGSA(gst.go, n = 10))
+
+```
+
+# Results
+
+### Default: All Genomic Regions
+
+The top three enriched GO terms that were statistically significant when tested across all genomic regions without bias correction are cytoplasm, regulation of response to stimulus and localization (Table 1). The general GO categories that showed enrichment were cellular components and biological processes. For comparison, an enrichment study with similar parameters with bias correction yielded the following GO terms: inflammatory response and immune system process (Table 2). The general GO categories for the analysis accounting for bias that were statistically significant was biological process.
+
+```{r, out.width="60%"}
+knitr::include_graphics("/Users/15713/Documents/Project/Table_1_GO_default_bias_correction.png")
+```
+
+```{r, out.width="60%"}
+knitr::include_graphics("/Users/15713/Documents/Project/Table_2_GO_default_without_bias_correction.png")
+```
+
+The enriched KEGG pathways not accounting for multi-probe bias were Axon guidance, Lipid and atherosclerosis, Yersinia infection, Th17 cell differentiation, Protein digestion and absorption, Pathways in cancer, Chemokine signaling pathway, T cell receptor signaling pathways, Focal adhesion and Glycosaminoglycan biosynthesis (Table 3). When performing a similar KEGG analysis with bias correction, there were no significant KEGG pathways (Table 4).
+
+```{r, out.width="60%"}
+knitr::include_graphics("/Users/15713/Documents/Project/Table_3_KEGG_default_with_bias_correction.png")
+```
+
+```{r, out.width="60%"}
+knitr::include_graphics("/Users/15713/Documents/Project/Table_4_KEGG_default_without_bias_correction.png")
+```
+
+### Promoter: TSS200, TSS1500, 1stExon
+
+In order to study the enriched gene ontology terms associated with CpGs located in the promoter region, an enrichment analysis combined the following genomic regions: TSS200, TSS1500, and 1stExon. The overall GO categories enriched using bias correction was biological process; however, these results were not statistically significant (Table 5). The overall and specific GO categories yielded from the enrichment method without bias correction were biological processes and regulation of immune system processes, respectively (Table 6).
+
+```{r, out.width="75%"}
+knitr::include_graphics("/Users/15713/Documents/Project/Table_5_GO_promoter_with_bias_correction.png")
+```
+
+```{r, out.width="75%"}
+knitr::include_graphics("/Users/15713/Documents/Project/Table_6_GO_promoter_without_bias_correction.png")
+```
+
+The enriched KEGG pathways for CpGs in the promoter region were similar with and without bias correction. The statistically significant enriched KEGG pathway is the Th17 cell differentiation pathway with the FDR value of 0.042(Table 8).
+
+```{r, out.width="50%"}
+knitr::include_graphics("/Users/15713/Documents/Project/Table_7_KEGG_promoter_with_bias_correction.png")
+```
+
+```{r, out.width="50%"}
+knitr::include_graphics("/Users/15713/Documents/Project/Table_8_KEGG_promoter_without_bias_correction.png")
+```
+
+### Body
+
+The significant GO category from the enrichment test of the CpGs in the body genomic region was molecular function (Table 9 and 10). When accounting for bias correction the major GO terms were GTPase regular activity, nucleoside-triphosphatase regular activity and GTPase activator activity (Table 9).
+
+```{r, out.width="60%"}
+knitr::include_graphics("/Users/15713/Documents/Project/Table_9_GO_body_with_bias_correction.png")
+```
+
+```{r, out.width="60%"}
+knitr::include_graphics("/Users/15713/Documents/Project/Table_10_GO_body_without_bias_correction.png")
+```
+
+### 5' UTR Region Enrichment Results
+
+The enriched KEGG pathways for both accounting and not accounting for bias yielded similar results: Glycosphingolipid biosynthesis and T cell receptor signaling pathway (Table 11 and Table 12). The GO analysis produced not statistically significant results (Supplemental tables \_\_\_ and \_\_\_\_).
+
+```{r, out.width="60%"}
+knitr::include_graphics("/Users/15713/Documents/Project/Table_11_KEGG_5_with_bias_correction.png")
+```
+
+```{r, out.width="60%"}
+knitr::include_graphics("/Users/15713/Documents/Project/Table_12_KEGG_5_without_bias_correction.png")
+```
+
+No statistically significant gene ontology or KEGG pathway results yielded from the enrichment tests that analyzed CpGs in the TSS200 and 3'UTR genomic regions. Refer to supplemental tables 9 - 12 for TSS200 results and supplemental tables 13 - 16 for 3' UTR results.
+
+# Discussion
+
+### Interpretation of GO terms for DMR for all genomic regions
+
+When accounting for the multi-probe bias in our enrichment analysis of the differentially methylated CpG across all genomic regions, the Gene Ontology terms with a FDR value less than 0.05 were inflammatory response, immune system response, and immune response (Table 2). It is of interest to note the significant GO terms that were produced from a similar enrichment analysis with the exception of bias correction: cytoplasm, regulation of response to stimulus and localization (Table 1). It is evident the differences in significant GO terms were attributed to the multi-probe bias effect, which has shown to confound gene enrichment results for DNAm studies since the number of CpG probes has been shown to correlate with gene size. The York et. al. study that provided a framework for the current research yielded a similar set of GO terms for all genomic regions: inflammatory activation and immune response.
+
+### Interpretation of KEGG pathways for DMR for all genomic regions
+
+The KEGG pathway analysis for the DMR across all genomic regions reproduced similar results to that of the York. et. al project. The KEGG pathways accounting for multi-probe bias were enriched for Lipid atherosclerosis, Th17 cell differentiation and hematopoietic cell lineage (Table 4). However, the KEGG pathways did not have an FDR value less than 0.05. The enriched KEGG pathways with multi-probe bias correction were axon guidance, lipid atherosclerosis, Yersinia infection, and Th17 cell differentiation (Table 3). It is interesting to note that the York et. al. study shows that the enriched KEGG pathways were Th17 cell differentiation and axon guidance.
+
+### Analyzing the Gene Ontology and KEGG pathways for the promoter region
+
+In addition to performing enrichment studies for the overall genomic region, it is of interest to specifically analyze the CpGs in the promoter region. The enriched GO terms accounting for bias correction were similar to that of the overall genomic region: regulation of immune system process (Table 6). This finding supports the York et. al. study that utilizes an enrichment method without bias correction that yielded GO terms relating to the immune system. The current study highlighted a similar enriched KEGG pathway as the prior study, which is the Th17 cell differentiation (Table 8). Given that the GO terms and KEGG pathways enriched for the CpGs in the promoter region are similar to the significant enriched terms and pathways for the overall genomic region, it can be concluded that the promoter region was the driving component for enrichment.
+
+### Analyzing the enriched GO and KEGG pathways for the Body
+
+The current study aligned with the York et. al. findings of an overall GO category of molecular function and GO terms of GTPase regulator activity, nucleoside-triphosphatase regular activity and GTPase activator activity (Table 17). However, the current study specifically utilized "Body" as the genomic region, while the York. et. al. study utilized all genomic regions to yield the GO term relating to GTPase activity. This difference could be attributed to the variation in enrichment methods and whether the method accounted for bias correction.
+
+### Analyzing the enriched KEGG pathways for the 5' UTR
+
+The enriched KEGG pathway considering with and without bias correction was Glycosphingolipid biosynthesis (Table 11 and Table 12). The Glycosphingolipid biosynthesis pathway is not apparent in the PREG study. Upon literature review, it is studied that Glycosphingolipids are involved in immune processes, including cell differentiation and immune recognition (Zhang et. al., 2019). The current enrichment test for enriched GO terms for all genomic regions revealed terms relating to immune and inflammatory response (Table 2). It can be speculated that the Glycosphingolipid biosynthesis KEGG pathway is associated with enriched CpGs in the 5' UTR genomic region.
+
+### Comparing overall GO categories
+
+It is of importance to note that utilization of bias correction produced similar overall GO categories (BP for biological process, MF for molecular function and CC for cellular component) to enrichment methods without bias correction. The difference in results between the two methods lies in the specific GO terms and KEGG pathways. The baseline study reported gene ontology terms that belonged to the biological processes and cellular competent categories.
+
+### Strengths and Limitations of the Study
+
+The strengths of this study are that the data supports the previous findings indicated in the York et. al. study, which highlights that in addition to the clusterProfiler package, the missMethyl package is an effective method that can perform enrichment analysis with and without bias correction for overall and specific genomic regions. Given that the missMethyl package allowed passing specific genomic regions as parameters, the results showed what component could be driving the enrichment. Overall, the current study, which accounted for the multi-probe bias correction, provided consistent results with the clusterProfiler package that did not use bias correction methods. Although there were no major differences in enriched GO terms and KEGG pathways between the current and PREG studies, it is important to note that fetal umbilical cord data was used. There may be differences in results utilizing bias correction with different data sets. Another point to take into consideration is that GO terms and KEGG pathways are limited and do not provide the whole picture of biological relevance of the enriched CpGs.
+
+### Future prospects
+
+This research can serve as a baseline for future studies that want to compare the differences in enriched gene ontology terms and KEGG pathways utilizing enrichment methods with and without bias correction. Researchers could expand on the findings of this study to explore other measures besides DNA methylation to understand the effects of early gestation age.
+
+### Additional Links
+
+Supplemental Tables: <https://osf.io/5j89d/?view_only=7fcf8a761e47479ba1da715a162dae35> Full R Script: <https://mfr.osf.io/render?url=https://osf.io/brfqs/?direct%26mode=render%26action=download%26mode=render>
+
+### References
+
+Dong, D., Tian, Y., Zheng, S. C., & Teschendorff, A. E. (2019). ebGSEA: An Improved Gene Set Enrichment Analysis method for Epigenome-Wide-Association Studies, Bioinformatics, 35(18), 3514--3516. <https://doi.org/10.1093/bioinformatics/btz073>
+
+Maksimovic, J., Oshlack, A. & Phipson, B. (2021). Gene Set Enrichment Analysis for Genome-wide DNA Methylation Data. Genome Biology, 22, 173. <doi:10.1186/s13059-021-02388-x>
+
+Ren, X., Kuan, P. F. (2022, May 1). methylGSA: Gene Set Analysis for DNA Methylation Datasets. METHYLGSA: Gene set analysis for DNA methylation datasets. Retrieved May 11, 2022, from <https://bioconductor.org/packages/devel/bioc/vignettes/methylGSA/inst/doc/methylGSA-vignette.html>
+
+York, T.P., Latendresse, S. J., Jackson-Cook, C., Lapato, D.M., Moyer, S., Wolen, A. R., Roberson-Nay, R., Do, E. K., Murphy, S.K., Hoyo, C. , Fuemmeler, B.F. & Strauss, J.F. (2020). Replicated Umbilical Cord Blood DNA Methylation Loci Associated with Gestational Age at Birth, Epigenetics, 15(11), 1243-1258. doi: 10.1080/15592294.2020.1767277
+
+Zhang, T., de Waard, A. A., Wuhrer, M., Spaapen, R. M. (1, January 1). The role of glycosphingolipids in immune cell functions. Frontiers. Retrieved May 11, 2022, from <https://www.frontiersin.org/articles/10.3389/fimmu.2019.00090/full>
