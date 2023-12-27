@@ -22,11 +22,11 @@ In addition to performing enrichment studies for the overall genomic region, it 
 
 Analyzing the enriched GO and KEGG pathways for the Body
 
-The current study aligned with the York et. al.Â findings of an overall GO category of molecular function and GO terms of GTPase regulator activity, nucleoside-triphosphatase regular activity and GTPase activator activity (Table 17). However, the current study specifically utilized âBodyâ as the genomic region, while the York. et. al.Â study utilized all genomic regions to yield the GO term relating to GTPase activity. This difference could be attributed to the variation in enrichment methods and whether the method accounted for bias correction.
+The current study aligned with the York et. al. findings of an overall GO category of molecular function and GO terms of GTPase regulator activity, nucleoside-triphosphatase regular activity and GTPase activator activity (Table 17). However, the current study specifically utilized Body as the genomic region, while the York. et. al. study utilized all genomic regions to yield the GO term relating to GTPase activity. This difference could be attributed to the variation in enrichment methods and whether the method accounted for bias correction.
 
-Analyzing the enriched KEGG pathways for the 5â UTR
+Analyzing the enriched KEGG pathways for the 5' UTR
 
-The enriched KEGG pathway considering with and without bias correction was Glycosphingolipid biosynthesis (Table 11 and Table 12). The Glycosphingolipid biosynthesis pathway is not apparent in the PREG study. Upon literature review, it is studied that Glycosphingolipids are involved in immune processes, including cell differentiation and immune recognition (Zhang et. al., 2019). The current enrichment test for enriched GO terms for all genomic regions revealed terms relating to immune and inflammatory response (Table 2). It can be speculated that the Glycosphingolipid biosynthesis KEGG pathway is associated with enriched CpGs in the 5â UTR genomic region.
+The enriched KEGG pathway considering with and without bias correction was Glycosphingolipid biosynthesis (Table 11 and Table 12). The Glycosphingolipid biosynthesis pathway is not apparent in the PREG study. Upon literature review, it is studied that Glycosphingolipids are involved in immune processes, including cell differentiation and immune recognition (Zhang et. al., 2019). The current enrichment test for enriched GO terms for all genomic regions revealed terms relating to immune and inflammatory response (Table 2). It can be speculated that the Glycosphingolipid biosynthesis KEGG pathway is associated with enriched CpGs in the 5' UTR genomic region.
 
 Comparing overall GO categories
 
@@ -36,15 +36,15 @@ Strengths and Limitations of the Study
 
 The strengths of this study are that the data supports the previous findings indicated in the York et. al.Â study, which highlights that in addition to the clusterProfiler package, the missMethyl package is an effective method that can perform enrichment analysis with and without bias correction for overall and specific genomic regions. Given that the missMethyl package allowed passing specific genomic regions as parameters, the results showed what component could be driving the enrichment. Overall, the current study, which accounted for the multi-probe bias correction, provided consistent results with the clusterProfiler package that did not use bias correction methods. Although there were no major differences in enriched GO terms and KEGG pathways between the current and PREG studies, it is important to note that fetal umbilical cord data was used. There may be differences in results utilizing bias correction with different data sets. Another point to take into consideration is that GO terms and KEGG pathways are limited and do not provide the whole picture of biological relevance of the enriched CpGs.
 
-Future prospects
+## Future prospects
 
 This research can serve as a baseline for future studies that want to compare the differences in enriched gene ontology terms and KEGG pathways utilizing enrichment methods with and without bias correction. Researchers could expand on the findings of this study to explore other measures besides DNA methylation to understand the effects of early gestation age.
 
-Additional Links
+## Additional Links
 
 Supplemental Tables: https://osf.io/5j89d/?view_only=7fcf8a761e47479ba1da715a162dae35 Full R Script: https://mfr.osf.io/render?url=https://osf.io/brfqs/?direct%26mode=render%26action=download%26mode=render
 
-References
+## References
 
 Dong, D., Tian, Y., Zheng, S. C., & Teschendorff, A. E. (2019). ebGSEA: An Improved Gene Set Enrichment Analysis method for Epigenome-Wide-Association Studies, Bioinformatics, 35(18), 3514â3516. https://doi.org/10.1093/bioinformatics/btz073
 
